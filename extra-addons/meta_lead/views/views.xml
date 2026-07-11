@@ -1,0 +1,120 @@
+<odoo>
+    <!-- Campaign list View with Button -->
+    <record id="view_facebook_campaign_list" model="ir.ui.view">
+        <field name="name">crm.facebook.campaign.list</field>
+        <field name="model">crm.facebook.campaign</field>
+        <field name="arch" type="xml">
+            <list string="Facebook Campaigns" create="false" delete="false">
+                <field name="name"/>
+                <field name="fb_form_id"/>
+                <field name="status"/>
+                <field name="page_id"/>
+                <button name="action_view_leadforms"
+                        type="object"
+                        string="View Lead Forms"
+                        class="btn-secondary"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Lead Form list View -->
+    <record id="view_facebook_leadform_list" model="ir.ui.view">
+        <field name="name">crm.facebook.leadform.list</field>
+        <field name="model">crm.facebook.leadform</field>
+        <field name="arch" type="xml">
+            <list string="Facebook Lead Forms" create="false" delete="false">
+                <field name="name"/>
+                <field name="form_id"/>
+                <field name="campaign_id"/>
+                <field name="account_id"/>
+                <field name="leads_count"/>
+                <button name="action_fetch_leads"
+                        type="object"
+                        string="Fetch Leads"
+                        class="btn-primary"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Lead Form Form View -->
+    <record id="view_facebook_leadform_form" model="ir.ui.view">
+        <field name="name">crm.facebook.leadform.form</field>
+        <field name="model">crm.facebook.leadform</field>
+        <field name="arch" type="xml">
+            <form string="Facebook Lead Form" create="false" edit="false" delete="false">
+                <header>
+                    <button name="action_fetch_leads"
+                            type="object"
+                            string="Fetch Leads"
+                            class="btn-primary"/>
+                </header>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="form_id"/>
+                        <field name="campaign_id"/>
+                        <field name="account_id"/>
+                        <field name="leads_count"/>
+                    </group>
+                    <group string="Last Fetch Summary" invisible="not last_fetch_summary">
+                        <field name="last_fetch_summary" nolabel="1" colspan="2" readonly="1"/>
+                    </group>
+
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Lead Form Action -->
+    <record id="action_facebook_leadform" model="ir.actions.act_window">
+        <field name="name">Lead Forms</field>
+        <field name="res_model">crm.facebook.leadform</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Lead Form Search View -->
+    <record id="view_facebook_leadform_search" model="ir.ui.view">
+        <field name="name">crm.facebook.leadform.search</field>
+        <field name="model">crm.facebook.leadform</field>
+        <field name="arch" type="xml">
+            <search string="Facebook Lead Forms">
+                <field name="name"/>
+                <field name="form_id"/>
+                <field name="account_id"/>
+                <separator/>
+                <filter name="group_by_account" string="Facebook Account" context="{'group_by': 'account_id'}"/>
+                <filter name="group_by_campaign" string="Campaign" context="{'group_by': 'campaign_id'}"/>
+            </search>
+        </field>
+    </record>
+    <!-- Inherit CRM Lead Form View to add Facebook fields -->
+    <record id="crm_lead_view_form_inherit_facebook" model="ir.ui.view">
+        <field name="name">crm.lead.form.inherit.facebook</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_lead_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Facebook Lead Info" name="facebook_info" invisible="not fb_lead_id">
+                    <group>
+                        <field name="fb_lead_id" readonly="1"/>
+                        <field name="fb_form_id" readonly="1"/>
+                        <field name="fb_campaign_id" readonly="1"/>
+                        <field name="raw_data" readonly="1"/>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Hide Salesperson/Assignee column in List View -->
+    <record id="crm_lead_view_list_inherit_hide_assignee" model="ir.ui.view">
+        <field name="name">crm.lead.list.inherit.hide.assignee</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_case_tree_view_leads"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='user_id']" position="attributes">
+                <attribute name="column_invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>

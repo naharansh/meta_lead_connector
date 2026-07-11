@@ -1,0 +1,73 @@
+<odoo>
+    <!-- Facebook Account Form View -->
+    <record id="view_facebook_account_form" model="ir.ui.view">
+        <field name="name">facebook.account.form</field>
+        <field name="model">crm.facebook.account</field>
+        <field name="arch" type="xml">
+            <form string="Facebook Account">
+                <field name="connection_valid" invisible="1"/>
+                <header>
+                    <button name="action_test_connection"
+                            type="object"
+                            string="Test Connection"
+                            class="btn-primary"/>
+                    <button name="action_verify_token"
+                            type="object"
+                            string="Verify Token"
+                            class="btn-secondary"/>
+                    <button name="action_sync_leadforms"
+                            type="object"
+                            string="Sync Lead Forms"
+                            class="btn-secondary"/>
+                    <button name="action_debug_token"
+                            type="object"
+                            string="Debug Token"
+                            class="btn-secondary"/>
+                </header>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="access_token" password="True"/>
+                        <field name="page_id"/>
+                        <field name="app_id"/>
+                        <field name="app_secret" password="True"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Facebook Account List View -->
+    <record id="view_facebook_account_list" model="ir.ui.view">
+        <field name="name">facebook.account.list</field>
+        <field name="model">crm.facebook.account</field>
+        <field name="arch" type="xml">
+            <list string="Facebook Accounts">
+                <field name="name"/>
+                <field name="app_id"/>
+                <field name="page_id"/>
+                <field name="connection_valid"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Facebook Accounts Action -->
+    <record id="action_facebook_account" model="ir.actions.act_window">
+        <field name="name">Facebook Accounts</field>
+        <field name="res_model">crm.facebook.account</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Facebook Accounts Root Menu under CRM -->
+    <menuitem id="menu_facebook_account_root"
+              name="Facebook Accounts"
+              parent="crm.crm_menu_root"
+              sequence="50"/>
+
+    <!-- Facebook Accounts Submenu -->
+    <menuitem id="menu_facebook_account"
+              name="Accounts"
+              parent="menu_facebook_account_root"
+              action="action_facebook_account"
+              sequence="10"/>
+</odoo>

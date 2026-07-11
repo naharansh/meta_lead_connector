@@ -1,0 +1,19 @@
+version: "3.9"
+
+services:
+  odoo:
+    image: odoo:19.0
+    container_name: meta_lead
+    restart: always
+    ports:
+      - "8069:8069"
+
+    environment:
+      DB_HOST: host.docker.internal
+      DB_USER: meta
+      DB_PASSWORD: m
+      DB_PORT: 5432
+
+    volumes:
+      - ./extra-addons:/mnt/extra-addons
+      - ./config:/etc/odoo
