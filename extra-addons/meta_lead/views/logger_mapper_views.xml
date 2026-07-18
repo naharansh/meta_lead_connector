@@ -1,0 +1,70 @@
+<odoo>
+    <!-- Logger View -->
+    <record id="view_facebook_logger_list" model="ir.ui.view">
+        <field name="name">facebook.logger.list</field>
+        <field name="model">facebook.logger</field>
+        <field name="arch" type="xml">
+            <list string="Facebook Logs" create="false" edit="false" delete="true">
+                <field name="execution_time"/>
+                <field name="name"/>
+                <field name="log_type" widget="badge" decoration-info="log_type == 'info'" decoration-warning="log_type == 'warning'" decoration-danger="log_type == 'error'"/>
+                <field name="message"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_facebook_logger" model="ir.actions.act_window">
+        <field name="name">Facebook Logger</field>
+        <field name="res_model">facebook.logger</field>
+        <field name="view_mode">list</field>
+    </record>
+
+    <menuitem id="menu_facebook_logger"
+              name="Facebook Logger"
+              parent="menu_facebook_integration_root"
+              action="action_facebook_logger"
+              sequence="40"
+              groups="meta_lead.group_facebook_user"/>
+
+    <!-- Mapper Views -->
+    <record id="view_facebook_mapper_list" model="ir.ui.view">
+        <field name="name">facebook.mapper.list</field>
+        <field name="model">facebook.mapper</field>
+        <field name="arch" type="xml">
+            <list string="Facebook Mapper" editable="bottom">
+                <field name="name"/>
+                <field name="crm_field_id"/>
+                <field name="facebook_field"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_facebook_mapper_form" model="ir.ui.view">
+        <field name="name">facebook.mapper.form</field>
+        <field name="model">facebook.mapper</field>
+        <field name="arch" type="xml">
+            <form string="Facebook Mapper">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="crm_field_id"/>
+                        <field name="facebook_field"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_facebook_mapper" model="ir.actions.act_window">
+        <field name="name">Odoo Facebook Mapper</field>
+        <field name="res_model">facebook.mapper</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="menu_facebook_mapper"
+              name="Odoo Facebook Mapper"
+              parent="menu_facebook_integration_root"
+              action="action_facebook_mapper"
+              sequence="50"
+              groups="meta_lead.group_facebook_user"/>
+</odoo>

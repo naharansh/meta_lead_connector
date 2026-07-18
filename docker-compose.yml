@@ -10,8 +10,8 @@ services:
 
     environment:
       DB_HOST: host.docker.internal
-      DB_USER: meta
-      DB_PASSWORD: m
+      DB_USER: facebook_init
+      DB_PASSWORD: face
       DB_PORT: 5432
 
     volumes:

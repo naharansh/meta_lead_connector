@@ -21,10 +21,12 @@ Long description of module's purpose
 
     # always loaded
     'data': [
+        'security/security.xml',
         'security/ir.model.access.csv',
         'views/token.xml',
         'views/facebook.xml',
         'views/views.xml',
+        'views/logger_mapper_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
@@ -32,4 +34,3 @@ Long description of module's purpose
     ],
     'installable': True,
 }
-

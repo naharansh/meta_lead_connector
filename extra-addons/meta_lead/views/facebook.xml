@@ -40,18 +40,19 @@
         </field>
     </record>
 
-    <!-- Action -->
+    <!-- Lead Forms Action -->
     <record id="action_facebook_campaign" model="ir.actions.act_window">
-        <field name="name">Lead Forms</field>
+        <field name="name">Odoo Facebook Forms</field>
         <field name="res_model">crm.facebook.leadform</field>
         <field name="view_mode">list,form</field>
         <field name="context">{'create': False}</field>
     </record>
 
-    <!-- Menu inside CRM -->
+    <!-- Odoo Facebook Forms Submenu -->
     <menuitem id="menu_facebook_campaign"
-              name="Lead Forms"
-              parent="meta_lead.menu_facebook_account_root"
+              name="Odoo Facebook Forms"
+              parent="menu_facebook_integration_root"
               action="action_facebook_campaign"
-              sequence="20"/>
+              sequence="30"
+              groups="meta_lead.group_facebook_user"/>
 </odoo>

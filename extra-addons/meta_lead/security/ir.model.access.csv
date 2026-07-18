@@ -1,4 +1,8 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_facebook_account_all,facebook.account.all,model_crm_facebook_account,base.group_user,1,1,1,1
-access_facebook_campaign_all,facebook.campaign.all,model_crm_facebook_campaign,base.group_user,1,1,1,1
-access_facebook_leadform_all,facebook.leadform.all,model_crm_facebook_leadform,base.group_user,1,1,1,1
+access_facebook_instance_all,facebook.instance.all,model_facebook_instance,meta_lead.group_facebook_user,1,1,1,1
+access_facebook_page_all,facebook.page.all,model_facebook_page,meta_lead.group_facebook_user,1,1,1,1
+access_facebook_campaign_all,facebook.campaign.all,model_crm_facebook_campaign,meta_lead.group_facebook_user,1,1,1,1
+access_facebook_leadform_all,facebook.leadform.all,model_crm_facebook_leadform,meta_lead.group_facebook_user,1,1,1,1
+access_facebook_logger_all,facebook.logger.all,model_facebook_logger,meta_lead.group_facebook_user,1,1,1,1
+access_facebook_mapper_all,facebook.mapper.all,model_facebook_mapper,meta_lead.group_facebook_user,1,1,1,1
+access_facebook_leadform_mapping_line_all,facebook.leadform.mapping.line.all,model_crm_facebook_leadform_mapping_line,meta_lead.group_facebook_user,1,1,1,1

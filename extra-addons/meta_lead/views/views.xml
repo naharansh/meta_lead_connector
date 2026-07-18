@@ -26,12 +26,9 @@
                 <field name="name"/>
                 <field name="form_id"/>
                 <field name="campaign_id"/>
-                <field name="account_id"/>
+                <field name="page_id"/>
                 <field name="leads_count"/>
-                <button name="action_fetch_leads"
-                        type="object"
-                        string="Fetch Leads"
-                        class="btn-primary"/>
+               
             </list>
         </field>
     </record>
@@ -41,25 +38,44 @@
         <field name="name">crm.facebook.leadform.form</field>
         <field name="model">crm.facebook.leadform</field>
         <field name="arch" type="xml">
-            <form string="Facebook Lead Form" create="false" edit="false" delete="false">
+            <form string="Facebook Lead Form" create="false" delete="false">
                 <header>
+                    <button name="action_import_fields"
+                            type="object"
+                            string="Import Fields"
+                            class="btn-primary"/>
                     <button name="action_fetch_leads"
                             type="object"
-                            string="Fetch Leads"
+                            string="Fetch Lead"
                             class="btn-primary"/>
                 </header>
                 <sheet>
                     <group>
-                        <field name="name"/>
-                        <field name="form_id"/>
-                        <field name="campaign_id"/>
-                        <field name="account_id"/>
-                        <field name="leads_count"/>
+                        <group>
+                            <field name="name" string="Form Name" readonly="1"/>
+                            <field name="form_id" string="Form Id" readonly="1"/>
+                            <field name="page_id" string="Facebook Page" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="instance_id" string="Facebook Instance" readonly="1"/>
+                            <field name="pagination_size" string="Pagination Size"/>
+                            <field name="last_sync_date" string="Last Sync Date"/>
+                            <field name="active_scheduler" string="Active Scheduler" widget="boolean_toggle"/>
+                        </group>
                     </group>
-                    <group string="Last Fetch Summary" invisible="not last_fetch_summary">
-                        <field name="last_fetch_summary" nolabel="1" colspan="2" readonly="1"/>
+                    <group string="FIELDS MAPPING">
+                        <field name="mapping_line_ids" nolabel="1" colspan="2">
+                            <list editable="bottom">
+                                <field name="odoo_field_id" string="Odoo Fields Label"/>
+                                <field name="odoo_field_name" string="Odoo Fields" readonly="1" force_save="1"/>
+                                <field name="odoo_field_type" string="Odoo Fields Type" readonly="1" force_save="1"/>
+                                <field name="fb_field_label" string="Facebook Fields Label"/>
+                                <field name="fb_field_name" string="Facebook Fields"/>
+                                <field name="fb_field_type" string="Facebook Fields Type"/>
+                                <field name="description" string="Description"/>
+                            </list>
+                        </field>
                     </group>
-
                 </sheet>
             </form>
         </field>
@@ -80,9 +96,9 @@
             <search string="Facebook Lead Forms">
                 <field name="name"/>
                 <field name="form_id"/>
-                <field name="account_id"/>
+                <field name="page_id"/>
                 <separator/>
-                <filter name="group_by_account" string="Facebook Account" context="{'group_by': 'account_id'}"/>
+                <filter name="group_by_page" string="Facebook Page" context="{'group_by': 'page_id'}"/>
                 <filter name="group_by_campaign" string="Campaign" context="{'group_by': 'campaign_id'}"/>
             </search>
         </field>
@@ -104,6 +120,15 @@
                 </page>
             </xpath>
         </field>
+    </record>
+
+    <!-- Facebook Leads Action (filtered CRM leads) -->
+    <record id="action_facebook_leads" model="ir.actions.act_window">
+        <field name="name">Facebook Leads</field>
+        <field name="res_model">crm.lead</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="domain">[('fb_lead_id', '!=', False)]</field>
+        <field name="context">{'default_type': 'lead'}</field>
     </record>
 
     <!-- Hide Salesperson/Assignee column in List View -->
