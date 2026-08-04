@@ -3,9 +3,20 @@ from odoo.exceptions import UserError
 import json
 import re
 import requests
+from datetime import datetime as _dt
 from datetime import timezone as _tz
 
 FB_API = "https://graph.facebook.com/v25.0"
+
+
+def _parse_fb_datetime(value):
+    """Convert a Facebook ISO-8601 datetime string to a naive UTC datetime."""
+    if not value:
+        return False
+    try:
+        return _dt.fromisoformat(value.replace('Z', '+00:00')).astimezone(_tz.utc).replace(tzinfo=None)
+    except (ValueError, TypeError):
+        return False
 
 
 class FacebookCampaign(models.Model):
@@ -45,42 +56,55 @@ class FacebookCampaign(models.Model):
             access_token = p.access_token
 
             url = f"{FB_API}/{page_id}/leadgen_forms"
-            try:
-                resp = requests.get(url, params={
-                    'access_token': access_token,
-                    'fields': 'id,name,status,leads_count'
-                }, timeout=15).json()
-            except Exception as e:
-                errors.append(f"Page {p.name}: request failed: {e}")
-                continue
+            next_url = None
+            while True:
+                try:
+                    if next_url:
+                        resp = requests.get(next_url, params={
+                            'access_token': access_token,
+                        }, timeout=15).json()
+                    else:
+                        resp = requests.get(url, params={
+                            'access_token': access_token,
+                            'fields': 'id,name,status,created_time,leads_count'
+                        }, timeout=15).json()
+                except Exception as e:
+                    errors.append(f"Page {p.name}: request failed: {e}")
+                    break
 
-            if 'error' in resp:
-                err = resp['error']
-                errors.append(f"Page {p.name}: {err.get('message')}")
-                continue
+                if 'error' in resp:
+                    err = resp['error']
+                    errors.append(f"Page {p.name}: {err.get('message')}")
+                    break
 
-            for form in resp.get('data', []):
-                campaign = self.search([('fb_form_id', '=', form['id'])])
-                if not campaign:
-                    campaign = self.create({
+                for form in resp.get('data', []):
+                    campaign = self.search([('fb_form_id', '=', form['id'])])
+                    if not campaign:
+                        campaign = self.create({
+                            'name': form.get('name'),
+                            'fb_form_id': form['id'],
+                            'page_id': page_id,
+                            'status': 'active',
+                        })
+
+                    leadform = leadform_model.search([('form_id', '=', form['id'])])
+                    vals = {
                         'name': form.get('name'),
-                        'fb_form_id': form['id'],
-                        'page_id': page_id,
-                        'status': 'active',
-                    })
+                        'form_id': form['id'],
+                        'campaign_id': campaign.id,
+                        'page_id': p.id,
+                        'leads_count': form.get('leads_count', 0),
+                        'created_time': _parse_fb_datetime(form.get('created_time')),
+                    }
+                    if leadform:
+                        leadform.write(vals)
+                    else:
+                        leadform_model.create(vals)
 
-                leadform = leadform_model.search([('form_id', '=', form['id'])])
-                vals = {
-                    'name': form.get('name'),
-                    'form_id': form['id'],
-                    'campaign_id': campaign.id,
-                    'page_id': p.id,
-                    'leads_count': form.get('leads_count', 0),
-                }
-                if leadform:
-                    leadform.write(vals)
-                else:
-                    leadform_model.create(vals)
+                paging = resp.get('paging', {})
+                next_url = paging.get('next')
+                if not next_url:
+                    break
 
             synced_count += 1
 
@@ -133,6 +157,7 @@ class FacebookLeadForm(models.Model):
     active_scheduler = fields.Boolean(string="Active Scheduler", default=False)
     
     leads_count = fields.Integer(string="Leads Count", default=0)
+    created_time = fields.Datetime(string="Created Time")
     last_fetched = fields.Datetime(string="Last Fetched Time", default=False)
     last_fetch_summary = fields.Text(string="Last Fetch Summary")
     lead_ids = fields.One2many('crm.lead', 'fb_form_id', string="Fetched Leads")
