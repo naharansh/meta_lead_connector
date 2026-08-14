@@ -320,9 +320,9 @@ class FacebookLeadForm(models.Model):
             raise UserError(f"✅ No new leads found on Facebook for this form{sync_filter_msg}.")
 
         crm_lead_env = self.env['crm.lead']
-        fb_tag = self.env['crm.tag'].search([('name', '=', 'Facebook')], limit=1)
-        if not fb_tag:
-            fb_tag = self.env['crm.tag'].create({'name': 'Facebook'})
+        source = self.env['utm.source'].search([('name', '=', 'Facebook')], limit=1)
+        if not source:
+            source = self.env['utm.source'].create({'name': 'Facebook'})
         latest_time = None
         created_count = 0
         skipped_count = 0
@@ -375,7 +375,7 @@ class FacebookLeadForm(models.Model):
                 'fb_form_id': self.id,
                 'type': 'lead',
                 'user_id': False,
-                'tag_ids': [(4, fb_tag.id)],
+                'source_id': source.id,
             }
             lead_description = f"Created Time: {fb_lead.get('created_time')}\n"
 
