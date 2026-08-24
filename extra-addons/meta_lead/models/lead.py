@@ -200,7 +200,7 @@ class FacebookLeadForm(models.Model):
         # Clear existing mapping lines
         self.mapping_line_ids.unlink()
 
-        IrModelFields = self.env['ir.model.fields']
+        IrModelFields = self.env['ir.model.fields'].sudo()
         
         # A dictionary to auto-map common facebook keys to CRM field technical names
         auto_map = {
@@ -252,7 +252,7 @@ class FacebookLeadForm(models.Model):
 
         return True
 
-    def action_fetch_leads(self):
+    def action_fetch_leads(self, silent=False):
         """Fetch leads for this form and create crm.lead records"""
         self.ensure_one()
         page = self.page_id
@@ -264,7 +264,7 @@ class FacebookLeadForm(models.Model):
 
         limit = self.pagination_size or 100
 
-        # Build base params — apply filtering from last_sync_date to only fetch that day's leads
+        # Build base params — incremental filtering: fetch everything created since Last Sync Date
         params = {
             'access_token': access_token,
             'fields': 'id,created_time,field_data',
@@ -272,12 +272,9 @@ class FacebookLeadForm(models.Model):
         }
         filtering = []
         if self.last_sync_date:
-            import datetime as dt
-            day_start = self.last_sync_date.replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=_tz.utc)
-            day_end = day_start + dt.timedelta(days=1)
+            since_ts = int(self.last_sync_date.replace(tzinfo=_tz.utc).timestamp())
             filtering = [
-                {"field": "time_created", "operator": "GREATER_THAN_OR_EQUAL", "value": int(day_start.timestamp())},
-                {"field": "time_created", "operator": "LESS_THAN", "value": int(day_end.timestamp())},
+                {"field": "time_created", "operator": "GREATER_THAN_OR_EQUAL", "value": since_ts},
             ]
             params['filtering'] = json.dumps(filtering)
 
@@ -314,10 +311,22 @@ class FacebookLeadForm(models.Model):
 
         sync_filter_msg = ""
         if filtering:
-            sync_filter_msg = f" (filtering time_created >= {filtering[0]['value']} AND time_created < {filtering[1]['value']})"
+            sync_filter_msg = f" (fetching leads created >= {self.last_sync_date.strftime('%Y-%m-%d %H:%M:%S')} UTC)"
 
         if not all_leads:
-            raise UserError(f"✅ No new leads found on Facebook for this form{sync_filter_msg}.")
+            no_leads_msg = f"No new leads found on Facebook for this form{sync_filter_msg}."
+            if not silent:
+                raise UserError(f"✅ {no_leads_msg}")
+            self.sudo().write({
+                'last_fetch_summary': no_leads_msg,
+                'last_sync_date': fields.Datetime.now(),
+            })
+            self.env['facebook.logger'].create({
+                'name': 'Fetch Leads',
+                'log_type': 'warning',
+                'message': f"Form: {self.name} (ID: {self.form_id})\n{no_leads_msg}"
+            })
+            return no_leads_msg
 
         crm_lead_env = self.env['crm.lead']
         source = self.env['utm.source'].search([('name', '=', 'Facebook')], limit=1)
@@ -336,6 +345,13 @@ class FacebookLeadForm(models.Model):
 
         for fb_lead in all_leads:
             lead_id = str(fb_lead['id'])
+
+            created_time_str = fb_lead.get('created_time')
+            if created_time_str:
+                created_time_str = created_time_str[:19].replace('T', ' ')
+            if created_time_str and (latest_time is None or created_time_str > latest_time):
+                latest_time = created_time_str
+
             existing_lead = crm_lead_env.search([('fb_lead_id', '=', lead_id)], limit=1)
             if existing_lead:
                 skipped_count += 1
@@ -362,12 +378,6 @@ class FacebookLeadForm(models.Model):
                     duplicate_phones.append(phone)
                     skipped_count += 1
                     continue
-
-            created_time_str = fb_lead.get('created_time')
-            if created_time_str:
-                created_time_str = created_time_str[:19].replace('T', ' ')
-            if created_time_str and (latest_time is None or created_time_str > latest_time):
-                latest_time = created_time_str
 
             lead_data = {
                 'name': f"{self.name} - {lead_id}",
@@ -429,6 +439,7 @@ class FacebookLeadForm(models.Model):
         self.sudo().write({
             'last_fetch_summary': msg,
             'leads_count': actual_count,
+            'last_sync_date': latest_time or fields.Datetime.now(),
         })
 
         # Log action
@@ -440,8 +451,11 @@ class FacebookLeadForm(models.Model):
 
         self.env.cr.commit()
 
-        if created_count == 0:
+        if created_count == 0 and not silent:
             raise UserError(msg)
+
+        if silent:
+            return msg
 
         return {
             'type': 'ir.actions.client',
@@ -453,6 +467,24 @@ class FacebookLeadForm(models.Model):
                 'sticky': True,
             },
         }
+
+    @api.model
+    def cron_fetch_scheduled_leads(self):
+        """Scheduled Action: auto-fetch leads for forms with Active Scheduler enabled"""
+        forms = self.search([
+            ('active_scheduler', '=', True),
+            ('page_id.instance_id.active_scheduler', '=', True),
+        ])
+        for form in forms:
+            try:
+                form.action_fetch_leads(silent=True)
+            except Exception as e:
+                self.env['facebook.logger'].create({
+                    'name': 'Scheduled Fetch Failed',
+                    'log_type': 'error',
+                    'message': f"Form: {form.name} (ID: {form.form_id})\n{e}"
+                })
+        return True
 
 
 class FacebookLeadFormMappingLine(models.Model):
@@ -473,11 +505,12 @@ class FacebookLeadFormMappingLine(models.Model):
     @api.depends('odoo_field_id')
     def _compute_odoo_field_type(self):
         for line in self:
-            if not line.odoo_field_id:
+            field = line.sudo().odoo_field_id
+            if not field:
                 line.odoo_field_type = ''
                 continue
             
-            ttype = line.odoo_field_id.ttype
+            ttype = field.ttype
             # Map Odoo types to PostgreSQL-like database types as shown in screenshot
             if ttype in ('char', 'text', 'selection', 'many2one'):
                 line.odoo_field_type = 'character varying'
@@ -493,7 +526,7 @@ class FacebookLeadFormMappingLine(models.Model):
     @api.onchange('odoo_field_id')
     def _onchange_odoo_field_id(self):
         if self.odoo_field_id:
-            self.odoo_field_label = self.odoo_field_id.field_description
+            self.odoo_field_label = self.sudo().odoo_field_id.field_description
 
 
 class CrmLead(models.Model):

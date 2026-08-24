@@ -5,11 +5,12 @@
         <record id="module_category_facebook_integration" model="ir.module.category">
             <field name="name">Facebook Integration</field>
             <field name="description">Facebook Integration Module</field>
+            <field name="sequence">20</field>
         </record>
 
-        <!-- Privilege for Facebook Integration User level -->
+        <!-- Privilege for Facebook Integration Access -->
         <record id="privilege_facebook_user" model="res.groups.privilege">
-            <field name="name">User</field>
+            <field name="name">Access</field>
             <field name="category_id" ref="module_category_facebook_integration"/>
             <field name="sequence">10</field>
         </record>
@@ -18,8 +19,16 @@
         <record id="group_facebook_user" model="res.groups">
             <field name="name">User</field>
             <field name="privilege_id" ref="privilege_facebook_user"/>
-            <field name="comment">Grants full access to Facebook Integration features.</field>
+            <field name="comment">Grants access to Facebook Forms and Facebook Logs.</field>
             <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <!-- Facebook Integration Administrator Group -->
+        <record id="group_facebook_manager" model="res.groups">
+            <field name="name">Administrator</field>
+            <field name="privilege_id" ref="privilege_facebook_user"/>
+            <field name="comment">Grants full access to all Facebook Integration features and configuration.</field>
+            <field name="implied_ids" eval="[(4, ref('meta_lead.group_facebook_user'))]"/>
         </record>
 
     </data>

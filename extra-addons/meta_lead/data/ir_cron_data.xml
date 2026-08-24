@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Scheduled Action: auto-fetch leads for forms with Active Scheduler enabled -->
+    <record id="ir_cron_fetch_scheduled_leads" model="ir.cron">
+        <field name="name">Facebook Leads: Auto Fetch</field>
+        <field name="model_id" ref="model_crm_facebook_leadform"/>
+        <field name="state">code</field>
+        <field name="code">model.cron_fetch_scheduled_leads()</field>
+        <field name="interval_number">30</field>
+        <field name="interval_type">minutes</field>
+        <field name="active" eval="True"/>
+    </record>
+</odoo>
