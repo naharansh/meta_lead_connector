@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_facebook_capi_account_tree" model="ir.ui.view">
+        <field name="name">facebook.capi.account.list</field>
+        <field name="model">facebook.capi.account</field>
+        <field name="arch" type="xml">
+            <list string="Meta CAPI Accounts">
+                <field name="name"/>
+                <field name="page_id"/>
+                <field name="team_id"/>
+                <field name="pixel_id"/>
+                <field name="is_connected" widget="boolean" readonly="1"/>
+                <field name="last_test_date" optional="show"/>
+                <field name="is_default"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_facebook_capi_account_form" model="ir.ui.view">
+        <field name="name">facebook.capi.account.form</field>
+        <field name="model">facebook.capi.account</field>
+        <field name="arch" type="xml">
+            <form string="Meta CAPI Account">
+                <header>
+                    <button name="action_sync_from_instance"
+                            type="object"
+                            string="Sync from Instance"
+                            class="btn-secondary"
+                            invisible="not page_id"
+                            title="Auto-fill Dataset ID and Token from the linked Facebook Instance"/>
+                    <button name="action_test_capi_connection"
+                            type="object"
+                            string="Test Connection"
+                            class="btn-primary"
+                            invisible="not pixel_id"/>
+                    <button name="action_fetch_meta_events"
+                            type="object"
+                            string="Fetch Events from Meta"
+                            class="btn-secondary"
+                            invisible="not id or not pixel_id or not access_token"
+                            icon="fa-download"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" type="object"
+                                name="action_test_capi_connection"
+                                icon="fa-check-circle"
+                                invisible="not is_connected">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Connected</span>
+                            </div>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="e.g. YuvMedia Dataset"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Routing">
+                            <field name="page_id"
+                                   options="{'no_create': True}"
+                                   help="Select the Facebook Page. Dataset ID and Token will auto-fill from the page's Instance."/>
+                            <field name="instance_id" readonly="1"/>
+                            <field name="team_id"/>
+                            <field name="is_default"/>
+                        </group>
+                        <group string="CAPI Credentials">
+                            <field name="pixel_id" placeholder="e.g. 1234567890"/>
+                            <field name="access_token" password="1"
+                                   placeholder="Paste System User Access Token"/>
+                            <field name="is_connected" widget="boolean_toggle" readonly="1"/>
+                            <field name="last_test_date" readonly="1"/>
+                        </group>
+                    </group>
+                    <div class="alert alert-info" role="status" style="margin-top:8px;" invisible="page_id">
+                        <p>
+                            <strong>💡 How to link to a Facebook Page:</strong>
+                        </p>
+                        <ol>
+                            <li>Select a <strong>Facebook Page</strong> above.</li>
+                            <li>Click <strong>Sync from Instance</strong> to auto-fill the Dataset ID and Token from the page's Facebook Instance.</li>
+                            <li>Or manually paste the Dataset ID and Access Token.</li>
+                            <li>Click <strong>Test Connection</strong> to verify the credentials.</li>
+                        </ol>
+                        <p>
+                            To configure CAPI credentials on a Facebook Instance:
+                            <strong>Facebook Integration → All Facebook Instances → open instance → CAPI CREDENTIALS section</strong>.
+                        </p>
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_facebook_capi_account" model="ir.actions.act_window">
+        <field name="name">Meta CAPI Accounts</field>
+        <field name="res_model">facebook.capi.account</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a Meta CAPI Account to route CRM leads to the right Meta Dataset.
+            </p>
+            <p>
+                Link each account to a <strong>Facebook Page</strong> to automatically resolve the Dataset ID and Access Token
+                from the page's Facebook Instance. Then click <strong>Test Connection</strong> to verify.
+            </p>
+        </field>
+    </record>
+
+    <record id="menu_facebook_capi_account" model="ir.ui.menu">
+        <field name="name">Meta CAPI Accounts</field>
+        <field name="parent_id" ref="crm.crm_menu_config"/>
+        <field name="action" ref="action_facebook_capi_account"/>
+        <field name="sequence">26</field>
+        <field name="group_ids" eval="[(6, 0, [
+            ref('meta_lead.group_facebook_manager'),
+            ref('base.group_system'),
+            ref('base.group_erp_manager'),
+            ref('sales_team.group_sale_manager')
+        ])]"/>
+    </record>
+</odoo>

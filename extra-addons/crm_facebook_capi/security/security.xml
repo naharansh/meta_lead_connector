@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Access control is unified with meta_lead (group_facebook_user and group_facebook_manager) -->
+    </data>
+</odoo>

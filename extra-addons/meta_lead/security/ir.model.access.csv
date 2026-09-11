@@ -11,7 +11,14 @@ access_facebook_leadform_mapping_line_user,facebook.leadform.mapping.line.user,m
 access_facebook_leadform_mapping_line_manager,facebook.leadform.mapping.line.manager,model_crm_facebook_leadform_mapping_line,meta_lead.group_facebook_manager,1,1,1,1
 access_facebook_logger_user,facebook.logger.user,model_facebook_logger,meta_lead.group_facebook_user,1,1,1,1
 access_facebook_logger_manager,facebook.logger.manager,model_facebook_logger,meta_lead.group_facebook_manager,1,1,1,1
+access_facebook_logger_system,facebook.logger.system,model_facebook_logger,base.group_system,1,1,1,1
+access_facebook_logger_erp,facebook.logger.erp,model_facebook_logger,base.group_erp_manager,1,1,1,1
+access_facebook_logger_sales_manager,facebook.logger.sales_manager,model_facebook_logger,sales_team.group_sale_manager,1,1,1,1
 access_facebook_mapper_user,facebook.mapper.user,model_facebook_mapper,meta_lead.group_facebook_user,1,0,0,0
 access_facebook_mapper_manager,facebook.mapper.manager,model_facebook_mapper,meta_lead.group_facebook_manager,1,1,1,1
 access_ir_model_fields_facebook_user,ir.model.fields.facebook.user,base.model_ir_model_fields,meta_lead.group_facebook_user,1,0,0,0
 access_ir_model_facebook_user,ir.model.facebook.user,base.model_ir_model,meta_lead.group_facebook_user,1,0,0,0
+access_facebook_leadform_internal_user,facebook.leadform.internal_user,model_crm_facebook_leadform,base.group_user,1,0,0,0
+access_facebook_campaign_internal_user,facebook.campaign.internal_user,model_crm_facebook_campaign,base.group_user,1,0,0,0
+access_facebook_page_internal_user,facebook.page.internal_user,model_facebook_page,base.group_user,1,0,0,0
+access_facebook_instance_internal_user,facebook.instance.internal_user,model_facebook_instance,base.group_user,1,0,0,0

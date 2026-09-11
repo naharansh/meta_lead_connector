@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_facebook_capi_stage_mapping_tree" model="ir.ui.view">
+        <field name="name">facebook.capi.stage.mapping.list</field>
+        <field name="model">facebook.capi.stage.mapping</field>
+        <field name="arch" type="xml">
+            <list string="CAPI Stage Mappings" editable="bottom">
+                <field name="stage_sequence" widget="handle"/>
+                <field name="stage_id"/>
+                <field name="event_id" placeholder="Select or type event..."/>
+                <field name="event_name"/>
+                <field name="action_source"/>
+                <field name="value_mode"/>
+                <field name="fixed_value" invisible="value_mode != 'fixed'"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_facebook_capi_stage_mapping_form" model="ir.ui.view">
+        <field name="name">facebook.capi.stage.mapping.form</field>
+        <field name="model">facebook.capi.stage.mapping</field>
+        <field name="arch" type="xml">
+            <form string="CAPI Stage Mapping">
+                <sheet>
+                    <div class="alert alert-info" role="status" style="margin-bottom: 16px;">
+                        <i class="fa fa-info-circle me-1" title="Info"/>
+                        <strong>Meta Lead Quality Recommendation:</strong>
+                        Map your <strong>Qualified</strong> stage to <code>QualifiedLead</code>, and your <strong>Won / Closed</strong> stage to <code>ConvertedLead</code> or <code>Purchase</code>.
+                    </div>
+                    <group>
+                        <group string="Stage &amp; Meta Event">
+                            <field name="stage_id"/>
+                            <field name="event_id" options="{'no_create_edit': False}"/>
+                            <field name="event_name"/>
+                            <field name="active"/>
+                        </group>
+                        <group string="Configuration">
+                            <field name="action_source"/>
+                            <field name="value_mode"/>
+                            <field name="fixed_value" invisible="value_mode != 'fixed'"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_facebook_capi_stage_mapping" model="ir.actions.act_window">
+        <field name="name">Meta CAPI Stage Mappings</field>
+        <field name="res_model">facebook.capi.stage.mapping</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a mapping between Odoo CRM stages and Meta Conversions API events.
+            </p>
+            <p>
+                Map stage transitions like "Qualified" to <code>QualifiedLead</code> or "Won" to <code>ConvertedLead</code> to train Meta's ad algorithm on your highest quality leads.
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="menu_facebook_capi_stage_mapping"
+              name="Meta CAPI Stage Mappings"
+              parent="crm.crm_menu_config"
+              action="action_facebook_capi_stage_mapping"
+              sequence="25"
+              groups="meta_lead.group_facebook_manager,base.group_system,base.group_erp_manager,sales_team.group_sale_manager"/>
+</odoo>

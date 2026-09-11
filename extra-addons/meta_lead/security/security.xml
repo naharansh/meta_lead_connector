@@ -31,5 +31,23 @@
             <field name="implied_ids" eval="[(4, ref('meta_lead.group_facebook_user'))]"/>
         </record>
 
+        <!-- Automatically imply group_facebook_user for Sales Users -->
+        <record id="sales_team.group_sale_salesman" model="res.groups">
+            <field name="implied_ids" eval="[(4, ref('meta_lead.group_facebook_user'))]"/>
+        </record>
+
+        <!-- Automatically imply group_facebook_manager for Sales Managers and Administrators -->
+        <record id="sales_team.group_sale_manager" model="res.groups">
+            <field name="implied_ids" eval="[(4, ref('meta_lead.group_facebook_manager'))]"/>
+        </record>
+
+        <record id="base.group_system" model="res.groups">
+            <field name="implied_ids" eval="[(4, ref('meta_lead.group_facebook_manager'))]"/>
+        </record>
+
+        <record id="base.group_erp_manager" model="res.groups">
+            <field name="implied_ids" eval="[(4, ref('meta_lead.group_facebook_manager'))]"/>
+        </record>
+
     </data>
 </odoo>

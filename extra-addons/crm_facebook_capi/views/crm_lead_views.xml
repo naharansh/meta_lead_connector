@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="crm_lead_view_form_inherit_facebook_capi" model="ir.ui.view">
+        <field name="name">crm.lead.form.inherit.facebook.capi</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_lead_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+               <!--  <button name="action_send_meta_capi"
+                        type="object"
+                        string="Send to Meta CAPI"
+                        class="btn-secondary"
+                        groups="meta_lead.group_facebook_manager,base.group_system"/> -->
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="Meta CAPI Tracking" name="meta_capi_tracking" invisible="not x_facebook_event_status" groups="meta_lead.group_facebook_manager,base.group_system">
+                    <group>
+                        <group string="Meta Event Status">
+                            <field name="x_facebook_last_event" readonly="1"/>
+                            <field name="x_facebook_event_status" widget="badge" readonly="1" decoration-success="x_facebook_event_status == 'sent'" decoration-danger="x_facebook_event_status == 'failed'" decoration-info="x_facebook_event_status == 'skipped'"/>
+                            <field name="x_facebook_sent_date" readonly="1"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

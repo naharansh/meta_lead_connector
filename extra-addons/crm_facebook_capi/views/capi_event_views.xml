@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_facebook_capi_event_tree" model="ir.ui.view">
+        <field name="name">facebook.capi.event.list</field>
+        <field name="model">facebook.capi.event</field>
+        <field name="arch" type="xml">
+            <list string="CAPI Event Definitions">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="description"/>
+                <field name="event_type"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_facebook_capi_event_search" model="ir.ui.view">
+        <field name="name">facebook.capi.event.search</field>
+        <field name="model">facebook.capi.event</field>
+        <field name="arch" type="xml">
+            <search string="Search CAPI Events">
+                <field name="name"/>
+                <field name="event_type"/>
+                <filter string="Standard Meta Event" name="type_standard" domain="[('event_type', '=', 'standard')]"/>
+                <filter string="Fetched from Meta" name="type_meta" domain="[('event_type', '=', 'meta_fetched')]"/>
+                <filter string="Custom" name="type_custom" domain="[('event_type', '=', 'custom')]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_facebook_capi_event" model="ir.actions.act_window">
+        <field name="name">Meta CAPI Event Definitions</field>
+        <field name="res_model">facebook.capi.event</field>
+        <field name="view_mode">list</field>
+        <field name="search_view_id" ref="view_facebook_capi_event_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No CAPI events defined yet.
+            </p>
+            <p>
+                Events are seeded automatically from the standard Meta Lead Quality events.
+                Use <strong>Fetch Events from Meta</strong> on a CAPI account to import additional events from your dataset.
+            </p>
+        </field>
+    </record>
+
+</odoo>

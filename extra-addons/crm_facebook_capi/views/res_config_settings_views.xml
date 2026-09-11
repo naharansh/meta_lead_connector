@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_inherit_facebook_capi" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.facebook.capi</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="crm.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//app[@name='crm']" position="inside">
+                <block title="Meta Conversions API (CAPI)" id="meta_capi_settings">
+                    <setting help="Code from Meta Events Manager → Test Events tab. Leave blank for production.">
+                        <label for="fb_capi_test_event_code"/>
+                        <div class="content">
+                            <field name="fb_capi_test_event_code"
+                                   placeholder="e.g. TEST12345"/>
+                            <p class="text-muted">
+                                API version is fixed at <strong>v25.0</strong>.
+                                Configure Dataset credentials under
+                                <strong>CRM → Configuration → Meta CAPI Accounts</strong>.
+                            </p>
+                        </div>
+                    </setting>
+                    <setting help="Secret token for optional Meta Lead Ads webhook subscription verification.">
+                        <label for="fb_capi_verify_token"/>
+                        <div class="content">
+                            <field name="fb_capi_verify_token"
+                                   placeholder="Optional webhook verify token"/>
+                        </div>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+</odoo>

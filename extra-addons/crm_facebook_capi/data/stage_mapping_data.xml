@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Default mapping for New stage -->
+        <record id="stage_mapping_new" model="facebook.capi.stage.mapping">
+            <field name="stage_id" ref="crm.stage_lead1"/>
+            <field name="event_name">Lead</field>
+            <field name="value_mode">none</field>
+            <field name="action_source">business_messaging</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- Default mapping for Won stage -->
+        <record id="stage_mapping_won" model="facebook.capi.stage.mapping">
+            <field name="stage_id" ref="crm.stage_lead4"/>
+            <field name="event_name">Purchase</field>
+            <field name="value_mode">expected_revenue</field>
+            <field name="action_source">business_messaging</field>
+            <field name="active" eval="True"/>
+        </record>
+    </data>
+</odoo>

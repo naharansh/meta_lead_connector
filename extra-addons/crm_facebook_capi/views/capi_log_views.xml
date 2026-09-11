@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_facebook_capi_log_tree" model="ir.ui.view">
+        <field name="name">facebook.capi.log.list</field>
+        <field name="model">facebook.capi.log</field>
+        <field name="arch" type="xml">
+            <list string="Meta CAPI Logs" create="false" edit="false">
+                <field name="create_date" string="Date"/>
+                <field name="lead_id"/>
+                <field name="account_id"/>
+                <field name="event_name"/>
+                <field name="status" widget="badge" decoration-success="status == 'sent'" decoration-danger="status == 'failed'" decoration-info="status == 'skipped'"/>
+                <field name="response_code"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_facebook_capi_log_form" model="ir.ui.view">
+        <field name="name">facebook.capi.log.form</field>
+        <field name="model">facebook.capi.log</field>
+        <field name="arch" type="xml">
+            <form string="Meta CAPI Log Entry" create="false" edit="false">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="create_date" string="Timestamp"/>
+                            <field name="lead_id"/>
+                            <field name="account_id"/>
+                            <field name="event_name"/>
+                        </group>
+                        <group>
+                            <field name="status" widget="badge" decoration-success="status == 'sent'" decoration-danger="status == 'failed'" decoration-info="status == 'skipped'"/>
+                            <field name="response_code"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Payload (PII Hashed)">
+                            <field name="payload"/>
+                        </page>
+                        <page string="Response Body">
+                            <field name="response_body"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_facebook_capi_log_search" model="ir.ui.view">
+        <field name="name">facebook.capi.log.search</field>
+        <field name="model">facebook.capi.log</field>
+        <field name="arch" type="xml">
+            <search string="Search CAPI Logs">
+                <field name="lead_id"/>
+                <field name="event_name"/>
+                <field name="status"/>
+                <filter string="Sent" name="status_sent" domain="[('status', '=', 'sent')]"/>
+                <filter string="Failed" name="status_failed" domain="[('status', '=', 'failed')]"/>
+                <filter string="Skipped" name="status_skipped" domain="[('status', '=', 'skipped')]"/>
+                <separator/>
+                <filter string="Group by Status" name="groupby_status" context="{'group_by': 'status'}"/>
+                <filter string="Group by Event Name" name="groupby_event" context="{'group_by': 'event_name'}"/>
+                <filter string="Group by Account" name="groupby_account" context="{'group_by': 'account_id'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_facebook_capi_log" model="ir.actions.act_window">
+        <field name="name">Meta CAPI Event Logs</field>
+        <field name="res_model">facebook.capi.log</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_facebook_capi_log_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No CAPI event logs found yet.
+            </p>
+            <p>
+                As leads move through stages mapped to CAPI events, log records will appear here.
+            </p>
+        </field>
+    </record>
+
+    <record id="menu_facebook_capi_log" model="ir.ui.menu">
+        <field name="name">Meta CAPI Event Logs</field>
+        <field name="parent_id" ref="crm.crm_menu_config"/>
+        <field name="action" ref="action_facebook_capi_log"/>
+        <field name="sequence">27</field>
+        <field name="group_ids" eval="[(6, 0, [
+            ref('meta_lead.group_facebook_manager'),
+            ref('base.group_system'),
+            ref('base.group_erp_manager'),
+            ref('sales_team.group_sale_manager')
+        ])]"/>
+    </record>
+
+
+
+    <!-- Meta CAPI Event Logs in Facebook Integration App -->
+    <record id="menu_facebook_capi_log_in_facebook" model="ir.ui.menu">
+        <field name="name">Meta CAPI Event Logs</field>
+        <field name="parent_id" ref="meta_lead.menu_facebook_integration_root"/>
+        <field name="action" ref="action_facebook_capi_log"/>
+        <field name="sequence">3</field>
+        <field name="group_ids" eval="[(6, 0, [
+            ref('meta_lead.group_facebook_manager'),
+            ref('base.group_system'),
+            ref('base.group_erp_manager'),
+            ref('sales_team.group_sale_manager')
+        ])]"/>
+    </record>
+</odoo>
