@@ -93,19 +93,4 @@
         ])]"/>
     </record>
 
-
-
-    <!-- Meta CAPI Event Logs in Facebook Integration App -->
-    <record id="menu_facebook_capi_log_in_facebook" model="ir.ui.menu">
-        <field name="name">Meta CAPI Event Logs</field>
-        <field name="parent_id" ref="meta_lead.menu_facebook_integration_root"/>
-        <field name="action" ref="action_facebook_capi_log"/>
-        <field name="sequence">3</field>
-        <field name="group_ids" eval="[(6, 0, [
-            ref('meta_lead.group_facebook_manager'),
-            ref('base.group_system'),
-            ref('base.group_erp_manager'),
-            ref('sales_team.group_sale_manager')
-        ])]"/>
-    </record>
 </odoo>

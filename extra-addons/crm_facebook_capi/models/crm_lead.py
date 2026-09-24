@@ -14,11 +14,7 @@ class CrmLead(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
-        leads = super().create(vals_list)
-        service = self.env["facebook.capi.service"].sudo()
-        for lead in leads:
-            service._on_stage_change(lead)
-        return leads
+        return super().create(vals_list)
 
     def write(self, vals):
         track_stage = "stage_id" in vals
@@ -30,7 +26,7 @@ class CrmLead(models.Model):
         for lead in self:
             if track_stage and lead.stage_id.id != old_stage.get(lead.id):
                 service._on_stage_change(lead)
-            elif track_type and old_type.get(lead.id) == "lead" and lead.type == "opportunity":
+            if track_type and old_type.get(lead.id) == "lead" and lead.type == "opportunity":
                 service._on_stage_change(lead)
         return res
 
