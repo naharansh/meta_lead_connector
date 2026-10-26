@@ -54,6 +54,6 @@
         <field name="parent_id" ref="menu_facebook_integration_root"/>
         <field name="action" ref="action_facebook_campaign"/>
         <field name="sequence">1</field>
-        <field name="group_ids" eval="[(6, 0, [ref('meta_lead.group_facebook_user')])]"/>
+        <field name="group_ids" eval="[(6, 0, [ref('sales_team.group_sale_manager')])]"/>
     </record>
 </odoo>

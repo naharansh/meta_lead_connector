@@ -267,7 +267,7 @@ class FacebookLeadForm(models.Model):
         # Build base params — incremental filtering: fetch everything created since Last Sync Date
         params = {
             'access_token': access_token,
-            'fields': 'id,created_time,field_data',
+            'fields': 'id,created_time,field_data,campaign_id,ad_id,ad_name,adset_id,adset_name,platform,is_organic',
             'limit': limit,
         }
         filtering = []
@@ -354,6 +354,16 @@ class FacebookLeadForm(models.Model):
 
             existing_lead = crm_lead_env.search([('fb_lead_id', '=', lead_id)], limit=1)
             if existing_lead:
+                # Refresh attribution fields on existing leads
+                existing_lead.write({
+                    'meta_campaign_id': fb_lead.get('campaign_id') or existing_lead.meta_campaign_id,
+                    'platform': fb_lead.get('platform') or existing_lead.platform,
+                    'ad_id': fb_lead.get('ad_id') or existing_lead.ad_id,
+                    'ad_name': fb_lead.get('ad_name') or existing_lead.ad_name,
+                    'adset_id': fb_lead.get('adset_id') or existing_lead.adset_id,
+                    'adset_name': fb_lead.get('adset_name') or existing_lead.adset_name,
+                    'is_organic': fb_lead.get('is_organic', existing_lead.is_organic),
+                })
                 skipped_count += 1
                 continue
 
@@ -386,6 +396,13 @@ class FacebookLeadForm(models.Model):
                 'type': 'lead',
                 'user_id': False,
                 'source_id': source.id,
+                'meta_campaign_id': fb_lead.get('campaign_id'),
+                'platform': fb_lead.get('platform'),
+                'ad_id': fb_lead.get('ad_id'),
+                'ad_name': fb_lead.get('ad_name'),
+                'adset_id': fb_lead.get('adset_id'),
+                'adset_name': fb_lead.get('adset_name'),
+                'is_organic': bool(fb_lead.get('is_organic', False)),
             }
             lead_description = f"Created Time: {fb_lead.get('created_time')}\n"
 
@@ -534,5 +551,12 @@ class CrmLead(models.Model):
 
     fb_lead_id = fields.Char(string="Facebook Lead ID", index=True)
     fb_form_id = fields.Many2one('crm.facebook.leadform', string="Facebook Lead Form")
-    fb_campaign_id = fields.Many2one(related='fb_form_id.campaign_id', string="Facebook Campaign", store=True)
+    facebook_campaign_id = fields.Many2one(related='fb_form_id.campaign_id', string="Facebook Campaign", store=True)
+    meta_campaign_id = fields.Char(string="Campaign ID")
+    platform = fields.Char(string="Platform")
+    ad_id = fields.Char(string="Ad ID")
+    ad_name = fields.Char(string="Ad Name")
+    adset_id = fields.Char(string="Ad Set ID")
+    adset_name = fields.Char(string="Ad Set Name")
+    is_organic = fields.Boolean(string="Is Organic")
     raw_data = fields.Text(string="Raw Data (Facebook)", help="Raw data from Facebook LeadGen webhook/API")

@@ -30,6 +30,7 @@ Supports per-team multi-dataset routing (e.g. YuvMedia vs YuvTrainings).
         "views/capi_event_views.xml",
         "views/crm_lead_views.xml",
         "views/res_config_settings_views.xml",
+        "views/menu_views.xml",
     ],
     "installable": True,
     "application": False,

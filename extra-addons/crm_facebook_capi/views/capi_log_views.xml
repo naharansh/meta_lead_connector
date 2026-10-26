@@ -80,17 +80,4 @@
         </field>
     </record>
 
-    <record id="menu_facebook_capi_log" model="ir.ui.menu">
-        <field name="name">Meta CAPI Event Logs</field>
-        <field name="parent_id" ref="crm.crm_menu_config"/>
-        <field name="action" ref="action_facebook_capi_log"/>
-        <field name="sequence">27</field>
-        <field name="group_ids" eval="[(6, 0, [
-            ref('meta_lead.group_facebook_manager'),
-            ref('base.group_system'),
-            ref('base.group_erp_manager'),
-            ref('sales_team.group_sale_manager')
-        ])]"/>
-    </record>
-
 </odoo>
